@@ -1,37 +1,114 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Café Sonhador</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- React & ReactDOM -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel Standalone para rodar JSX direto no navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Lucide Icons -->
-
-
-  <!-- Recharts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Recharts/2.12.7/Recharts.min.js"></script>
   <style>
-    body { font-family: 'IBM Plex Sans', sans-serif; background-color: #09090b; color: #e7e5e4; }
-    .font-serif { font-family: 'Fraunces', serif; }
+    body { margin: 0; min-height: 100vh; background: #0b1120; color: #f8fafc; font-family: 'IBM Plex Sans', sans-serif; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 48px; height: 48px; border-radius: 16px; background: #1f2937; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .title { margin: 0; font-size: clamp(2rem, 3vw, 3.4rem); letter-spacing: -0.04em; }
+    .subtitle { margin: 4px 0 0; color: #cbd5e1; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px; }
+    .card { background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.12); border-radius: 24px; padding: 20px; min-height: 140px; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35); }
+    .card h3 { margin: 0 0 10px; font-size: 1rem; color: #cbd5e1; }
+    .card p { margin: 0; font-size: 2.2rem; font-weight: 700; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .table th, .table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); }
+    .table th { color: #94a3b8; font-weight: 600; font-size: 0.9rem; }
+    .table td { color: #e2e8f0; }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+    .status-paid { background: #0f766e; color: #c7f9cc; }
+    .status-pending { background: #3730a3; color: #d8b4fe; }
+    .status-delayed { background: #881337; color: #fecaca; }
+    .footer { margin-top: 32px; color: #94a3b8; font-size: 0.95rem; }
+    @media (max-width: 640px) { .topbar { flex-direction: column; align-items: flex-start; } }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
-
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useCallback } = React;
-    const { 
-      Coffee, Package, ShoppingCart, TrendingUp, Settings: SettingsIcon, 
-      Plus, Trash2, AlertTriangle, CheckCircle2, Clock, LayoutDashboard, Wallet, ChevronDown 
-    } = lucide;
+    const { useState } = React;
+    function App() {
+      const [sales] = useState([
+        { id: 1, product: 'Café Expresso', amount: 32, date: '07/08/2026', status: 'Pago' },
+        { id: 2, product: 'Café Gelado', amount: 48, date: '07/08/2026', status: 'Pendente' },
+        { id: 3, product: 'Combo Doce', amount: 74, date: '06/08/2026', status: 'Pago' },
+        { id: 4, product: 'Café Latte', amount: 26, date: '05/08/2026', status: 'Atrasado' },
+      ]);
+      const total = sales.reduce((sum, item) => sum + item.amount, 0);
+      const paid = sales.filter(s => s.status === 'Pago').length;
+      const pending = sales.filter(s => s.status === 'Pendente').length;
+
+      return (
+        <div className="page">
+          <header className="topbar">
+            <div className="logo">
+              <div className="logo-icon">☕</div>
+              <div>
+                <h1 className="title">Café Sonhador</h1>
+                <p className="subtitle">Painel funcional de vendas e estoque para deploy no Vercel.</p>
+              </div>
+            </div>
+            <div className="card" style={{ minWidth: 220 }}>
+              <h3>Resumo rápido</h3>
+              <p>{sales.length} vendas</p>
+            </div>
+          </header>
+          <section className="grid">
+            <div className="card">
+              <h3>Receita total</h3>
+              <p>R$ {total.toFixed(2)}</p>
+            </div>
+            <div className="card">
+              <h3>Pedidos pagos</h3>
+              <p>{paid}</p>
+            </div>
+            <div className="card">
+              <h3>Pedidos pendentes</h3>
+              <p>{pending}</p>
+            </div>
+          </section>
+          <section className="card" style={{ marginTop: 24 }}>
+            <h3>Vendas recentes</h3>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Valor</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sales.map(s => (
+                  <tr key={s.id}>
+                    <td>{s.product}</td>
+                    <td>R$ {s.amount.toFixed(2)}</td>
+                    <td>{s.date}</td>
+                    <td>
+                      <span className={"status-pill " + (s.status === 'Pago' ? 'status-paid' : s.status === 'Pendente' ? 'status-pending' : 'status-delayed')}>
+                        {s.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+          <footer className="footer">Pronto para publicação: front-end atualizado e estável no deployment Vercel.</footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
